@@ -100,4 +100,141 @@ userRoutes.get("/", async (c) => {
   }
 });
 
+// Update user
+userRoutes.patch("/:id", async (c) => {
+  try {
+    const id = c.req.param("id");
+    const body = await c.req.json();
+
+    // Validate update data
+    const updateSchema = z.object({
+      email: z.string().email().optional(),
+    });
+
+    const validData = updateSchema.parse(body);
+
+    // Check if user exists
+    const existingUser = await db
+      .select()
+      .from(users)
+      .where(eq(users.id, id))
+      .limit(1);
+
+    if (!existingUser.length) {
+      const response: ApiResponse<null> = {
+        success: false,
+        error: "User not found",
+      };
+      return c.json(response, 404);
+    }
+
+    // Update user
+    const updatedUser = await db
+      .update(users)
+      .set(validData)
+      .where(eq(users.id, id))
+      .returning();
+
+    const response: ApiResponse<User> = {
+      success: true,
+      data: updatedUser[0] as User,
+    };
+    return c.json(response);
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      const response: ApiResponse<null> = {
+        success: false,
+        error: error.errors[0].message,
+      };
+      return c.json(response, 400);
+    }
+
+    const response: ApiResponse<null> = {
+      success: false,
+      error: "Failed to update user",
+    };
+    return c.json(response, 500);
+  }
+});
+
+// Delete user
+userRoutes.delete("/:id", async (c) => {
+  try {
+    const id = c.req.param("id");
+
+    // Check if user exists
+    const existingUser = await db
+      .select()
+      .from(users)
+      .where(eq(users.id, id))
+      .limit(1);
+
+    if (!existingUser.length) {
+      const response: ApiResponse<null> = {
+        success: false,
+        error: "User not found",
+      };
+      return c.json(response, 404);
+    }
+
+    // Delete user
+    await db.delete(users).where(eq(users.id, id));
+
+    const response: ApiResponse<null> = {
+      success: true,
+      data: null,
+    };
+    return c.json(response);
+  } catch (error) {
+    const response: ApiResponse<null> = {
+      success: false,
+      error: "Failed to delete user",
+    };
+    return c.json(response, 500);
+  }
+});
+
+// Regenerate API Key
+userRoutes.post("/:id/regenerate-key", async (c) => {
+  try {
+    const id = c.req.param("id");
+
+    // Check if user exists
+    const existingUser = await db
+      .select()
+      .from(users)
+      .where(eq(users.id, id))
+      .limit(1);
+
+    if (!existingUser.length) {
+      const response: ApiResponse<null> = {
+        success: false,
+        error: "User not found",
+      };
+      return c.json(response, 404);
+    }
+
+    // Update API key
+    const updatedUser = await db
+      .update(users)
+      .set({
+        apiKey: crypto.randomUUID(),
+      })
+      .where(eq(users.id, id))
+      .returning();
+
+    const response: ApiResponse<User> = {
+      success: true,
+      data: updatedUser[0] as User,
+    };
+    return c.json(response);
+  } catch (error) {
+    const response: ApiResponse<null> = {
+      success: false,
+      error: "Failed to regenerate API key",
+    };
+    return c.json(response, 500);
+  }
+});
+
 export { userRoutes };
