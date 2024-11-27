@@ -24,10 +24,10 @@ social-api/
 │   └── utils/
 │       ├── types.ts    # Type definitions
 │       └── validate.ts # Validation schemas
-├── drizzle/           # Database migrations
-├── .env              # Environment variables
-├── drizzle.config.ts # Drizzle configuration
-├── index.ts         # Application entry point
+├── drizzle/            # Database migrations
+├── .env                # Environment variables
+├── drizzle.config.ts   # Drizzle configuration
+├── index.ts            # Application entry point
 └── package.json
 ```
 
