@@ -19,7 +19,8 @@ social-api/
 │   │   ├── index.ts    # Database connection
 │   │   └── schema.ts   # Database schema
 │   ├── routes/
-│   │   └── users.ts    # User routes
+│   │   ├── users.ts    # User routes
+│   │   └── posts.ts    # Post routes
 │   └── utils/
 │       ├── types.ts    # Type definitions
 │       └── validate.ts # Validation schemas
@@ -78,37 +79,9 @@ Content-Type: application/json
 }
 ```
 
-Response:
-```json
-{
-  "success": true,
-  "data": {
-    "id": "uuid",
-    "email": "user@example.com",
-    "apiKey": "uuid",
-    "createdAt": "timestamp"
-  }
-}
-```
-
 #### Get All Users
 ```http
 GET /api/v1/users
-```
-
-Response:
-```json
-{
-  "success": true,
-  "data": [
-    {
-      "id": "uuid",
-      "email": "user@example.com",
-      "apiKey": "uuid",
-      "createdAt": "timestamp"
-    }
-  ]
-}
 ```
 
 #### Get User by ID
@@ -116,15 +89,88 @@ Response:
 GET /api/v1/users/:id
 ```
 
-Response:
+#### Update User
+```http
+PATCH /api/v1/users/:id
+Content-Type: application/json
+
+{
+  "email": "newemail@example.com"
+}
+```
+
+#### Delete User
+```http
+DELETE /api/v1/users/:id
+```
+
+#### Regenerate API Key
+```http
+POST /api/v1/users/:id/regenerate-key
+```
+
+### Posts
+
+#### Create Post
+```http
+POST /api/v1/posts
+Content-Type: application/json
+
+{
+  "content": "Hello World!",
+  "mediaUrls": ["image1.jpg"],
+  "platform": "twitter",
+  "status": "draft",
+  "scheduledFor": "2024-12-01T10:00:00Z"
+}
+```
+
+#### Get All Posts
+```http
+GET /api/v1/posts
+```
+
+#### Get User's Posts
+```http
+GET /api/v1/posts/user/:userId
+```
+
+#### Get Post by ID
+```http
+GET /api/v1/posts/:id
+```
+
+#### Update Post
+```http
+PATCH /api/v1/posts/:id
+Content-Type: application/json
+
+{
+  "content": "Updated content",
+  "status": "published"
+}
+```
+
+#### Delete Post
+```http
+DELETE /api/v1/posts/:id
+```
+
+Example Response:
 ```json
 {
   "success": true,
   "data": {
     "id": "uuid",
-    "email": "user@example.com",
-    "apiKey": "uuid",
-    "createdAt": "timestamp"
+    "userId": "user-uuid",
+    "content": "Hello World!",
+    "mediaUrls": ["image1.jpg"],
+    "platform": "twitter",
+    "status": "draft",
+    "scheduledFor": "2024-12-01T10:00:00Z",
+    "publishedAt": null,
+    "createdAt": "2024-11-26T12:00:00Z",
+    "updatedAt": "2024-11-26T12:00:00Z"
   }
 }
 ```
@@ -142,21 +188,9 @@ The API returns consistent error responses:
 
 Common HTTP status codes:
 - `400` - Bad Request (validation errors)
+- `401` - Unauthorized (invalid/missing API key)
 - `404` - Not Found
 - `500` - Server Error
-
-## Development
-
-Start the development server:
-```bash
-bun run dev
-```
-
-Run database migrations:
-```bash
-bun run db:generate  # Generate migrations
-bun run db:push     # Push to database
-```
 
 ## Type Definitions
 
@@ -167,6 +201,22 @@ interface User {
   email: string;
   apiKey: string | null;
   createdAt: Date | null;
+}
+```
+
+### Post
+```typescript
+interface Post {
+  id: string;
+  userId: string;
+  content: string;
+  mediaUrls: string[];
+  platform: 'twitter' | 'facebook' | 'instagram';
+  status: 'draft' | 'published' | 'scheduled';
+  publishedAt: Date | null;
+  scheduledFor: Date | null;
+  createdAt: Date;
+  updatedAt: Date;
 }
 ```
 
@@ -182,20 +232,17 @@ interface ApiResponse<T> {
 ## Future Enhancements
 
 - [ ] Authentication/Authorization
-- [ ] Social Media Platform Integration
 - [ ] Post Scheduling
-- [ ] Analytics
+- [ ] Analytics Dashboard
 - [ ] Media Upload Support
 - [ ] Rate Limiting
 - [ ] Caching
-
-## Contributing
-
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add some amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
+- [ ] Comments System
+- [ ] Like/Unlike Posts
+- [ ] User Following System
+- [ ] Social Platform Integration
+- [ ] Content Moderation
+- [ ] Hashtag System
 
 ## License
 
