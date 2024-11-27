@@ -32,7 +32,7 @@ userRoutes.post("/", async (c) => {
 
     const response: ApiResponse<User> = {
       success: true,
-      data: newUser[0] as User, // Type assertion since we know the structure
+      data: newUser[0] as User, 
     };
     return c.json(response);
   } catch (error) {
