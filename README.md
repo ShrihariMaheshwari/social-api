@@ -65,132 +65,65 @@ bun run db:push
 bun run dev
 ```
 
-## API Endpoints
+## API Testing
 
 ### Users
 
-#### Create User
-```http
-POST /api/v1/users
-Content-Type: application/json
+```bash
+# Create User
+curl -X POST http://localhost:3000/api/v1/users \
+  -H "Content-Type: application/json" \
+  -d '{"email": "test@example.com"}'
 
-{
-  "email": "user@example.com"
-}
-```
+# Get All Users
+curl http://localhost:3000/api/v1/users
 
-#### Get All Users
-```http
-GET /api/v1/users
-```
+# Get User by ID
+curl http://localhost:3000/api/v1/users/user-id
 
-#### Get User by ID
-```http
-GET /api/v1/users/:id
-```
+# Update User
+curl -X PATCH http://localhost:3000/api/v1/users/user-id \
+  -H "Content-Type: application/json" \
+  -d '{"email": "newemail@example.com"}'
 
-#### Update User
-```http
-PATCH /api/v1/users/:id
-Content-Type: application/json
+# Delete User
+curl -X DELETE http://localhost:3000/api/v1/users/user-id
 
-{
-  "email": "newemail@example.com"
-}
-```
-
-#### Delete User
-```http
-DELETE /api/v1/users/:id
-```
-
-#### Regenerate API Key
-```http
-POST /api/v1/users/:id/regenerate-key
+# Regenerate API Key
+curl -X POST http://localhost:3000/api/v1/users/user-id/regenerate-key
 ```
 
 ### Posts
 
-#### Create Post
-```http
-POST /api/v1/posts
-Content-Type: application/json
-
-{
-  "content": "Hello World!",
-  "mediaUrls": ["image1.jpg"],
-  "platform": "twitter",
-  "status": "draft",
-  "scheduledFor": "2024-12-01T10:00:00Z"
-}
-```
-
-#### Get All Posts
-```http
-GET /api/v1/posts
-```
-
-#### Get User's Posts
-```http
-GET /api/v1/posts/user/:userId
-```
-
-#### Get Post by ID
-```http
-GET /api/v1/posts/:id
-```
-
-#### Update Post
-```http
-PATCH /api/v1/posts/:id
-Content-Type: application/json
-
-{
-  "content": "Updated content",
-  "status": "published"
-}
-```
-
-#### Delete Post
-```http
-DELETE /api/v1/posts/:id
-```
-
-Example Response:
-```json
-{
-  "success": true,
-  "data": {
-    "id": "uuid",
-    "userId": "user-uuid",
+```bash
+# Create Post
+curl -X POST http://localhost:3000/api/v1/posts \
+  -H "Content-Type: application/json" \
+  -H "X-User-ID: user-id" \
+  -d '{
     "content": "Hello World!",
-    "mediaUrls": ["image1.jpg"],
+    "mediaUrls": ["https://example.com/image.jpg"],
     "platform": "twitter",
-    "status": "draft",
-    "scheduledFor": "2024-12-01T10:00:00Z",
-    "publishedAt": null,
-    "createdAt": "2024-11-26T12:00:00Z",
-    "updatedAt": "2024-11-26T12:00:00Z"
-  }
-}
+    "status": "draft"
+  }'
+
+# Get All Posts
+curl http://localhost:3000/api/v1/posts
+
+# Get User's Posts
+curl http://localhost:3000/api/v1/posts/user/user-id
+
+# Get Post by ID
+curl http://localhost:3000/api/v1/posts/post-id
+
+# Update Post
+curl -X PATCH http://localhost:3000/api/v1/posts/post-id \
+  -H "Content-Type: application/json" \
+  -d '{"status": "published"}'
+
+# Delete Post
+curl -X DELETE http://localhost:3000/api/v1/posts/post-id
 ```
-
-## Error Handling
-
-The API returns consistent error responses:
-
-```json
-{
-  "success": false,
-  "error": "Error message"
-}
-```
-
-Common HTTP status codes:
-- `400` - Bad Request (validation errors)
-- `401` - Unauthorized (invalid/missing API key)
-- `404` - Not Found
-- `500` - Server Error
 
 ## Type Definitions
 
@@ -220,14 +153,22 @@ interface Post {
 }
 ```
 
-### API Response
-```typescript
-interface ApiResponse<T> {
-  success: boolean;
-  data?: T;
-  error?: string;
+## Error Handling
+
+The API returns consistent error responses:
+
+```json
+{
+  "success": false,
+  "error": "Error message"
 }
 ```
+
+Common HTTP status codes:
+- `400` - Bad Request (validation errors)
+- `401` - Unauthorized (invalid/missing API key)
+- `404` - Not Found
+- `500` - Server Error
 
 ## Future Enhancements
 
@@ -241,12 +182,10 @@ interface ApiResponse<T> {
 - [ ] Like/Unlike Posts
 - [ ] User Following System
 - [ ] Social Platform Integration
-- [ ] Content Moderation
-- [ ] Hashtag System
 
 ## License
 
-This project is licensed under the MIT License - see the LICENSE file for details.
+MIT License
 
 ## Acknowledgments
 
