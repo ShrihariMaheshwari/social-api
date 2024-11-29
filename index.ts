@@ -4,6 +4,7 @@ import { cors } from "hono/cors";
 import { logger } from "hono/logger";
 import { prettyJSON } from "hono/pretty-json";
 import { userRoutes } from "./src/routes/users";
+import { postRoutes } from "./src/routes/posts";
 
 const app = new Hono();
 
@@ -25,6 +26,7 @@ app.get("/", (c) => {
 
 // Mount routes
 app.route("/api/v1/users", userRoutes);
+app.route("/api/v1/posts", postRoutes);
 
 export default {
   port: 3000,
